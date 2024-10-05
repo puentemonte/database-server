@@ -2,6 +2,8 @@
 
 From [this](https://youtu.be/qBvz5BqUOH8?si=NuJ3WMcAsbLsaGWe) video.
 
+Listening to [this](https://youtu.be/2EYUKW2o-5Q?si=7261jkQT0j76CoPi) while programming which was nice, will keep a playlist of what I listen to.
+
 Basic structure of DB consists of a (not quite) Binary Tree:
 * Nodes
 * Leaves
