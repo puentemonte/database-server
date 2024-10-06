@@ -21,7 +21,7 @@ To better illustrate the overall structure of the DB:
 ```      
 
 TODO:
-- [ ] Finish Binary Tree impl.
+- [x] Finish Binary Tree impl.
 - [ ] Create Redis database server
 - [ ] Create faster database server
 - [ ] Implement print funcs.
