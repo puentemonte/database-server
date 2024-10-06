@@ -20,9 +20,22 @@ To better illustrate the overall structure of the DB:
         /User/Login/ (Node) -> Erik (Leaf) -> ...
 ```      
 
+- Why do an in-memory DB?
+Fast read & write.
+DB between real DB and client (for example sessions in web dev).
+
+Focuses on CPU optimization. Not on Network optimization.
+
+So, the DB is going to be called Cache23 (since the original is called Cache22).
+
+Something useful when debugging C code:
+```
+strace -f ./executable
+```
+
 TODO:
 - [x] Finish Binary Tree impl.
-- [ ] Create Redis database server
+- [ ] Create Redis database server (currently working on this!)
 - [ ] Create faster database server
 - [ ] Implement print funcs.
 - [ ] Implement search algo.
