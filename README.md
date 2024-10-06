@@ -33,9 +33,27 @@ Something useful when debugging C code:
 strace -f ./executable
 ```
 
+To try the DB:
+
+- In one terminal
+```
+./executable
+```
+
+- In a different terminal
+```
+telnet localhost port
+```
+
+If it worked correctly, a message should appear both in the server and the client:
+
+```
+100 Connected to Cache23 server
+```
+
 TODO:
 - [x] Finish Binary Tree impl.
-- [ ] Create Redis database server (currently working on this!)
-- [ ] Create faster database server
+- [x] Create Redis database server 
+- [ ] Create faster database server (WORKING ON THIS RN)
 - [ ] Implement print funcs.
 - [ ] Implement search algo.
