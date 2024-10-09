@@ -57,3 +57,8 @@ TODO:
 - [ ] Create faster database server (WORKING ON THIS RN)
 - [ ] Implement print funcs.
 - [ ] Implement search algo.
+
+In the future:
+- Create DB from Scratch
+- Do all of this in python
+- Implement communication protocols: UART, SPI, I2C, CAN, USB...
