@@ -41,7 +41,67 @@ void zero(int8* buf, int16 size) {
 }
 
 void childloop(Client *client) {
+    int8* buf = (int8 *)malloc(256);
+    int8 *p = (int8 *)&buf;
+    int8 cmd[256], dir[256], args[256];
+
     sleep(1);
+
+    zero(buf, 256);
+    read(client->s, (char *)buf, 255);
+    printf("%s\n", buf);
+    int16 n = (int16)strlen((char *)buf);
+    printf("%d\n", n);
+    if(n <= 0) {
+        return;
+    }
+    if(n > 255) {
+        n = 255;
+    }
+
+    // command ie.: select /Users/erik
+    //              create /Users/logins
+    //              insert /Users/erik data...
+
+    zero(cmd, 128);
+    zero(dir, 128);
+    zero(args, 128);
+
+    while((*p) &&
+          (*p != ' ') &&
+          (*p != '\n') &&
+          (n--)) {
+        ++p;
+    }
+
+    strncpy((char *)cmd, (char *)buf, 256);
+
+    while((*p) &&
+          (*p != ' ') &&
+          (*p != '\n') &&
+          (n--)) {
+        ++p;
+    }
+
+    strncpy((char *)dir, (char *)buf, 256);
+
+    // args is optional field
+    while((*p) &&
+          (*p != ' ') &&
+          (*p != '\n') &&
+          (n--)) {
+        ++p;
+    }
+
+    if(!(*p) ||
+        (*p != ' ') ||
+        (*p != '\n') ||
+        (n != 0)) {
+        strncpy((char *)args, (char *)buf, 256);    
+    }
+
+
+    printf("%s %s %s\n", cmd, dir, args);
 
     return;
 }
