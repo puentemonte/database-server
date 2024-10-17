@@ -5,7 +5,7 @@ From [this](https://youtu.be/qBvz5BqUOH8?si=NuJ3WMcAsbLsaGWe) video.
 Listening to [this](https://youtu.be/2EYUKW2o-5Q?si=7261jkQT0j76CoPi) while programming which was nice, will keep a playlist of what I listen to.
 
 Actual playlist:
-* [Career -and general life- advice](https://youtu.be/2EYUKW2o-5Q?si=7261jkQT0j76CoPi)) 
+* [Career -and general life- advice](https://youtu.be/2EYUKW2o-5Q?si=7261jkQT0j76CoPi) 
 * [Chris Bumstead after winning his 6th Olympia](https://youtu.be/DHWEqlG7DI0?si=YHM-ByLMTCyvmGy8): it was nice but toooo many ads ffs
 * [Future Amazon SDE](https://www.youtube.com/@davidsha): actually quite enjoy having it in my second monitor while working
 
