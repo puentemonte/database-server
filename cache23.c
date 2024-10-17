@@ -2,6 +2,42 @@
 
 #include "cache23.h"
 
+bool scontinuation; // server continuation
+bool ccontinuation; // client continuation
+
+// Size of handlers is 16 * #handlers because both cmd and callback are 8 byte pointers
+CmdHandler handlers[] = {
+    { (int8 *)"hello", handle_hello },
+    { (int8 *)"goodbye", handle_hello }
+};
+
+Callback getcmd(int8 *cmd) {
+    Callback cb;
+    int16 n, arrlen;
+    
+    if(sizeof(handlers) < 16) {
+        return 0;
+    }
+    arrlen = sizeof(handlers) / 16;
+
+    cb = 0;
+
+    for(n=0; n<arrlen; ++n) {
+        if(!strcmp((char *)cmd, (char *)handlers[n].cmd)) {
+            cb = handlers[n].handler;
+        }
+    }
+
+    return cb;
+}
+
+int32 handle_hello(Client *client,
+                   int8 *dir,
+                   int8 *args) {
+   dprintf(client->s, "hello %s\n", dir);
+   return 0;
+}
+
 int initserver(int16 port) {
     struct sockaddr_in sock;
     int s;
@@ -28,9 +64,6 @@ int initserver(int16 port) {
     return s;
 }
 
-bool scontinuation; // server continuation
-bool ccontinuation; // client continuation
-                    
 void zero(int8* buf, int16 size) {
     int8 *p;
     int16 n;
@@ -38,70 +71,88 @@ void zero(int8* buf, int16 size) {
     for(n=0, p=buf; n<size; ++n, ++p) {
         *p = 0;
     }
+    return;
 }
 
-void childloop(Client *client) {
-    int8* buf = (int8 *)malloc(256);
-    int8 *p = (int8 *)&buf;
-    int8 cmd[256], dir[256], args[256];
+ // command ie.: select /Users/erik
+ //              create /Users/logins
+ //              insert /Users/erik data...
 
-    sleep(1);
+void childloop(Client *client) {
+    int8 buf[256]; 
+    int8 *p, *f;  
+    int16 n;  
+    int8 cmd[256], dir[256], args[256];
 
     zero(buf, 256);
     read(client->s, (char *)buf, 255);
-    printf("%s\n", buf);
-    int16 n = (int16)strlen((char *)buf);
-    printf("%d\n", n);
-    if(n <= 0) {
-        return;
-    }
-    if(n > 255) {
-        n = 255;
+    n = (int16)strlen((char *)buf);
+
+    if(n > 254) {
+        n = 254;
     }
 
-    // command ie.: select /Users/erik
-    //              create /Users/logins
-    //              insert /Users/erik data...
+    for(p=buf;
+        (*p) &&
+        (n--) &&
+        (*p != ' ') &&
+        (*p != '\n') &&
+        (*p != '\r');
+        ++p);
 
-    zero(cmd, 128);
-    zero(dir, 128);
-    zero(args, 128);
+    zero(cmd, 256);
+    zero(dir, 256);
+    zero(args, 256);
 
-    while((*p) &&
-          (*p != ' ') &&
-          (*p != '\n') &&
-          (n--)) {
-        ++p;
+
+    if(!(*p) || (!n)) {
+        strncpy((char *)cmd, (char *)buf, 255);
+        goto end;
+    }
+    else if(*p == ' ') {
+        *p = 0;
+        strncpy((char *)cmd, (char *)buf, 255);
+    }
+    else if((*p == '\n') ||
+            (*p == '\r')) {
+        *p = 0;
+        strncpy((char *)cmd, (char *)buf, 255);
+        goto end;
     }
 
-    strncpy((char *)cmd, (char *)buf, 256);
+    for(f=++p;
+            (*p) &&
+            (n--) &&
+            (*p != ' ') &&
+            (*p != '\n') &&
+            (*p != '\r');
+         ++p);
 
-    while((*p) &&
-          (*p != ' ') &&
-          (*p != '\n') &&
-          (n--)) {
-        ++p;
+    if(!(*p) || (!n)) {
+        strncpy((char *)dir, (char *)f, 255);
+        goto end;
+    }
+    else if((*p == ' ') ||
+            (*p == '\n') ||
+            (*p == '\r')) {
+        *p = 0;
+        strncpy((char *)dir, (char *)f, 255);
     }
 
-    strncpy((char *)dir, (char *)buf, 256);
-
-    // args is optional field
-    while((*p) &&
-          (*p != ' ') &&
-          (*p != '\n') &&
-          (n--)) {
-        ++p;
+    ++p;
+    if(*p) {
+        strncpy((char *)args, (char *)p, 255);
+        for(p=args; (*p) && 
+                    (*p != '\n') && 
+                    (*p != '\r');++p);
+        *p = 0;
     }
+    
 
-    if(!(*p) ||
-        (*p != ' ') ||
-        (*p != '\n') ||
-        (n != 0)) {
-        strncpy((char *)args, (char *)buf, 256);    
-    }
-
-
-    printf("%s %s %s\n", cmd, dir, args);
+end:
+     dprintf(client->s, "\ncmd:\t%s\n", cmd);
+     dprintf(client->s, "dir:\t%s\n", dir);
+     dprintf(client->s, "args:\t%s\n", args);
 
     return;
 }
@@ -123,13 +174,13 @@ void mainloop(int s) {
     port = (int16)htons((int)cli.sin_port);
     ip = inet_ntoa(cli.sin_addr);
 
-    printf("Connection from %s:%d\n", ip, port);
+    printf("\nConnection from %s:%d\n", ip, port);
 
     client = (Client *)malloc(sizeof(struct s_client));
     assert(client);
 
-    zero((int8 *) client, sizeof(struct s_client));
-    client->s = s;
+    zero((int8 *)client, sizeof(struct s_client));
+    client->s = sclient;
     client->port = port;
     strncpy(client->ip, ip, 15);
 
@@ -178,3 +229,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+#pragma GCC diagnostic pop

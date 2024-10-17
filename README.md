@@ -50,12 +50,17 @@ If it worked correctly, a message should appear both in the server and the clien
 ```
 100 Connected to Cache23 server
 ```
+#### Important info regarding build warnings
+
+If you want to disable `-Wunused-result` and `-Wstringop-truncation` warning when building, uncomment lines 23-25 in cacheXX.h and the last line in cacheXX.c
+
+#### End of important info
 
 TODO:
 - [x] Finish Binary Tree impl.
 - [x] Create Redis database server 
-- [ ] Create faster database server (WORKING ON THIS RN)
-- [ ] Implement print funcs.
+- [x] Create faster database server 
+- [ ] Implement print funcs. (WORKING ON THIS RN)
 - [ ] Implement search algo.
 
 In the future:

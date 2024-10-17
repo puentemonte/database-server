@@ -20,6 +20,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#pragma GCC diagnostic ignored "-Wunused-result"
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#pragma GCC diagnostic push
+
 #define HOST    "127.0.0.1"
 #define PORT    "12049"
 
@@ -41,10 +45,22 @@ struct s_client {
 
 typedef struct s_client Client;
 
-void zero(int8 *, int16);
+// Callback for the client commands: dir args
+typedef int32 (*Callback)(Client*,int8*,int8*);
+
+struct s_cmdhandler {
+    int8* cmd;
+    Callback handler;
+};
+
+typedef struct s_cmdhandler CmdHandler;
+
+void zero(int8*,int16);
 int initserver(int16);
 void mainloop(int);
-void childloop(Client *);
-int main(int, char**);
+void childloop(Client*);
+int main(int,char**);
+
+int32 handle_hello(Client*,int8*,int8*);
 
 #endif
