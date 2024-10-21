@@ -9,6 +9,10 @@
 #include <assert.h>
 #include <errno.h>
 
+#pragma GCC diagnostic ignored "-Wunused-result"
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#pragma GCC diagnostic push
+
 #define TagRoot 1 /* 00 01 */
 #define TagNode 2 /* 00 10 */
 #define TagLeaf 4 /* 01 00 */
@@ -22,6 +26,13 @@
 #define reterr(x) \
     errno = (x); \
     return nullptr
+
+#define Print(x) \
+    zero(buf, 256); \
+    strncpy((char *)buf, (char *)(x), 255); \
+    size = (int16)strlen((char *)buf); \
+    if(size) \
+        write(fd, (char *)buf, size)
 
 typedef unsigned int int32;
 typedef unsigned short int int16;
@@ -55,3 +66,13 @@ union u_tree {
 };
 
 typedef union u_tree Tree;
+
+void print_tree(int, Tree*);
+int8 *indent(int8);
+void zero(int8*, int16);
+Node *create_node(Node*, int8*);
+Leaf *find_last_linear(Node*);
+Leaf *create_leaf(Node*, int8*, int8*, int16);
+
+int main(void);
+

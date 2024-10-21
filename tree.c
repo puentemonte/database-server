@@ -10,6 +10,54 @@ Tree root = { .n = {
     .path = "/"
 }};
 
+void print_tree(int fd, Tree *origin) {
+   int8 indentation;
+   int8 buf[256];
+   int16 size;
+   Node *n;
+   Leaf *l, *last;
+
+   indentation = 0;
+   for(n=(Node *)origin; n; n=n->west) {
+      Print(indent(indentation++)); 
+      Print(n->path); 
+      Print("\n");
+      if(n->east) {
+          last = find_last(n);
+          if(last) {
+              for(l=last; (Node *)l->west!=n; l=(Leaf *)l->west) {
+                  Print(indent(indentation));
+                  Print(n->path);
+                  Print("/");
+                  Print(l->key);
+                  Print(" -> '");
+                  write(fd, (char *)l->value, (int)l->size);
+                  Print("'\n");
+              }
+          }
+      }
+   }
+   return;
+}
+
+int8 *indent(int8 tabs) {
+    static int8 buf[256];
+    int8 *p;
+
+    if(tabs < 1) {
+        return (int8 *) "";
+    }
+
+    assert(tabs < 120); // 256 / 2 = 128 (need \0 at the end) 128 - 1
+    zero(buf, 256);
+
+    int16 i;
+    for(i=0, p=buf; i<tabs; ++i, p+=2) {
+       strncpy((char*)p, "  ", 2);
+    }
+    return buf;
+}
+
 void zero(int8 *str, int16 size) {
     int8 *p;
     int16 n;
@@ -40,11 +88,10 @@ Node *create_node(Node *parent, int8 *path) {
 Leaf *find_last_linear(Node *parent) {
     Leaf *l;
 
-    errno = NoError;
     assert(parent);
 
     if(!parent->east) {
-        reterr(NoError);
+        return (Leaf *)0;
     }
     for(l=parent->east; l->east; l=l->east);
     assert(l);
@@ -59,7 +106,7 @@ Leaf *create_leaf(Node *parent, int8 *key, int8 *value, int16 count) {
     assert(parent);
     l = find_last(parent);
 
-    size =sizeof(struct s_leaf);
+    size = sizeof(struct s_leaf);
     new = (Leaf *)malloc(size);
     assert(new);
 
@@ -102,16 +149,14 @@ int main() {
     l1 = create_leaf(n2, key, value, size);
     assert(l1);
 
-    printf("%s\n", l1->value);
-
     key = (int8 *)"elena";
     value = (int8 *)"aa034945c";
     size = (int16)strlen((char *)value);
     l2 = create_leaf(n2, key, value, size);
     assert(l2);
 
-    printf("%s\n", l2->key);
-    
+    print_tree(1, &root);
+
     free(l2);
     free(l1);
     free(n2);
@@ -119,3 +164,5 @@ int main() {
  
     return 0;
 }
+#pragma GCC diagnostic pop
+

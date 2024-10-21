@@ -65,7 +65,7 @@ TODO:
 - [x] Finish Binary Tree impl.
 - [x] Create Redis database server 
 - [x] Create faster database server 
-- [ ] Implement print funcs. (WORKING ON THIS RN)
+- [x] Implement print funcs. (WORKING ON THIS RN IT DOESN'T WORK YET)
 - [ ] Implement search algo.
 
 In the future:
