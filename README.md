@@ -57,7 +57,19 @@ If it worked correctly, a message should appear both in the server and the clien
 ```
 #### Important info regarding build warnings
 
-If you want to disable `-Wunused-result` and `-Wstringop-truncation` warning when building, uncomment lines 23-25 in cacheXX.h and the last line in cacheXX.c
+If you want to disable `-Wunused-result` and `-Wstringop-truncation` warning when building, uncomment following lines in XXX.h:
+
+```c
+#pragma GCC diagnostic ignored "-Wunused-result"
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#pragma GCC diagnostic push
+```
+
+and the last line in XXX.c:
+
+```c
+#pragma GCC diagnostic pop
+```
 
 #### End of important info
 

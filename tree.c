@@ -25,7 +25,7 @@ void print_tree(int fd, Tree *origin) {
       if(n->east) {
           last = find_last(n);
           if(last) {
-              for(l=last; (Node *)l->west!=n; l=(Leaf *)l->west) {
+              for(l=last; (Node *)l!=n; l=(Leaf *)l->west) {
                   Print(indent(indentation));
                   Print(n->path);
                   Print("/");
@@ -85,6 +85,22 @@ Node *create_node(Node *parent, int8 *path) {
     return n;
 }
 
+Node *find_node(int8* path) {
+   Node *p, *ret;
+
+   for(ret=(Node *)0, p=(Node *)&root; p; p=p->west) {
+        if(!strcmp((char *)p->path, (char *)path)) {
+            ret = p;
+            break;
+        }
+   }
+   return ret;
+}
+
+Leaf *lookup_linear(int8 *path, int8 *key) {
+   return (Leaf *)0; 
+}
+
 Leaf *find_last_linear(Node *parent) {
     Leaf *l;
 
@@ -110,17 +126,17 @@ Leaf *create_leaf(Node *parent, int8 *key, int8 *value, int16 count) {
     new = (Leaf *)malloc(size);
     assert(new);
 
-    zero((int8 *)new, size);
-    new->tag = TagLeaf;
-
+    
     if(!l) { // directly connected, no hanging leaves
         parent->east = new;
-        new->west = (Tree *)parent;
     }
     else { // l is a leaf
         l->east = new; 
-        new->west = (Tree *)l;
     }
+
+    zero((int8 *)new, size);
+    new->tag = TagLeaf;
+    new->west = (!l) ? (Tree *)parent : (Tree *)l;
 
     strncpy((char *)new->key, (char *)key, 127);
     new->value = (int8 *)malloc(count);
@@ -151,6 +167,12 @@ int main() {
 
     key = (int8 *)"elena";
     value = (int8 *)"aa034945c";
+    size = (int16)strlen((char *)value);
+    l2 = create_leaf(n2, key, value, size);
+    assert(l2);
+
+    key = (int8 *)"julia";
+    value = (int8 *)"945c";
     size = (int16)strlen((char *)value);
     l2 = create_leaf(n2, key, value, size);
     assert(l2);

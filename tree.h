@@ -23,6 +23,8 @@
 //Nullptr nullptr = 0;
 
 #define find_last(x)    find_last_linear(x) // this way when changing the find function, we only need to change this statement instead of everywhere where it's called
+#define lookup(x,y)       lookup_linear(x,y)
+#define find_node(x)      find_node_linear(x)
 #define reterr(x) \
     errno = (x); \
     return nullptr
@@ -70,6 +72,8 @@ typedef union u_tree Tree;
 void print_tree(int, Tree*);
 int8 *indent(int8);
 void zero(int8*, int16);
+Leaf *lookup_linear(int8*, int8*);
+Node *finde_node_linear(int8*);
 Node *create_node(Node*, int8*);
 Leaf *find_last_linear(Node*);
 Leaf *create_leaf(Node*, int8*, int8*, int16);
