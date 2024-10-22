@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -18,12 +19,14 @@
 #define TagLeaf 4 /* 01 00 */
 
 #define NoError 0
+#define ExampleFile     "./wl.txt"
 
 //typedef void* Nullptr;
 //Nullptr nullptr = 0;
 
 #define find_last(x)    find_last_linear(x) // this way when changing the find function, we only need to change this statement instead of everywhere where it's called
-#define lookup(x,y)       lookup_linear(x,y)
+#define lookup(x,y)     lookup_linear(x,y)
+#define find_leaf(x,y)       find_leaf_linear(x,y)
 #define find_node(x)      find_node_linear(x)
 #define reterr(x) \
     errno = (x); \
@@ -72,11 +75,16 @@ typedef union u_tree Tree;
 void print_tree(int, Tree*);
 int8 *indent(int8);
 void zero(int8*, int16);
-Leaf *lookup_linear(int8*, int8*);
+int8* lookup_linear(int8*, int8*);
+Leaf *find_leaf_linear(int8*, int8*);
 Node *finde_node_linear(int8*);
 Node *create_node(Node*, int8*);
 Leaf *find_last_linear(Node*);
 Leaf *create_leaf(Node*, int8*, int8*, int16);
+int8 *test_duplicate(int8*);
+int8 *generate_test_path(int8);
+Tree *generate_test_tree(void);
+int32 generate_test_leaves(void);
 
 int main(void);
 

@@ -73,12 +73,21 @@ and the last line in XXX.c:
 
 #### End of important info
 
+### **Cool things**
+
+If ever encounter ^M at the end of words (definitely happened with win11) do:
+
+```bash
+col < filename.txt > filename2.txt
+mv -f filename2.txt filename.txt
+```
+
 TODO:
 - [x] Finish Binary Tree impl.
 - [x] Create Redis database server 
 - [x] Create faster database server 
-- [x] Implement print funcs. (WORKING ON THIS RN IT DOESN'T WORK YET)
-- [ ] Implement search algo.
+- [x] Implement print funcs. 
+- [x] Implement search algo.
 
 In the future:
 - Create DB from Scratch

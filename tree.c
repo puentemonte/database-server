@@ -97,8 +97,31 @@ Node *find_node(int8* path) {
    return ret;
 }
 
-Leaf *lookup_linear(int8 *path, int8 *key) {
-   return (Leaf *)0; 
+int8 *lookup_linear(int8 *path, int8 *key) {
+    Leaf *p;
+
+    p = find_leaf_linear(path, key);
+
+    return (p) ? p->value : (int8 *)0;
+}
+
+Leaf *find_leaf_linear(int8 *path, int8 *key) {
+    Node *n;
+    Leaf  *l, *ret;
+
+    n = find_node(path);
+    if(!n) {
+        return (Leaf *)0;
+    }
+    
+    // iterate through the leaves
+    for(ret=(Leaf *)0, l=n->east; l; l=l->east) {
+        if(!strcmp((char *)l->key, (char *)key)) {
+            ret = l;
+            break;
+        }
+    }
+    return ret;
 }
 
 Leaf *find_last_linear(Node *parent) {
@@ -148,42 +171,105 @@ Leaf *create_leaf(Node *parent, int8 *key, int8 *value, int16 count) {
     return new;
 }
 
-int main() {
-    Node *n, *n2;
-    Leaf *l1, *l2;
-    int8 *key, *value;
-    int16 size;
+Tree *generate_test_tree() {
+    Node *n, *p;
+    int8 c;
+    int8 path[256];
+    int32 size;
 
-    n = create_node((Node *)&root, (int8 *)"/Users"); 
-    assert(n);
-    n2 = create_node(n, (int8 *)"Users/login");
-    assert(n2);
+    zero(path, 256);
+    size = 0;
+
+    for(n=(Node *)&root, c='a'; c <= 'z'; ++c) {
+        size = (int32)strlen((char *)path);
+        *(path + size++) = '/';
+        *(path + size) = c;
+
+        p = n;
+        n = create_node(p, path);
+    }
+
+    return (Tree *)&root;
+}
+
+int8 *generate_test_path(int8 path) {
+    static int8 buf[256];
+    int8 c;
+    int32 counter;
+
+    zero(buf, 256);
+    for(c='a'; c<=path; ++c) {
+        counter = (int32)strlen((char *)buf);
+        *(buf + counter++) = '/';
+        *(buf + counter) = c;
+    }
+    return buf;
+}
+
+int8 *test_duplicate(int8 *str) {
+    static int8 buf[256];
+    int16 n;
+
+    zero(buf, 256);
+    strncpy((char *)buf, (char *)str, 255);  
+    n = (int16)strlen((char *)buf);  
     
-    key = (int8 *)"erik";
-    value = (int8 *)"abc77301aa";
-    size = (int16)strlen((char *)value);
-    l1 = create_leaf(n2, key, value, size);
-    assert(l1);
+    if((n * 2) > 255) {
+        return buf;
+    }
 
-    key = (int8 *)"elena";
-    value = (int8 *)"aa034945c";
-    size = (int16)strlen((char *)value);
-    l2 = create_leaf(n2, key, value, size);
-    assert(l2);
+    for (int16 i = 0; i < n; i++) {
+        buf[n + i] = buf[i];
+    }
 
-    key = (int8 *)"julia";
-    value = (int8 *)"945c";
-    size = (int16)strlen((char *)value);
-    l2 = create_leaf(n2, key, value, size);
-    assert(l2);
+    return buf;
+}
 
-    print_tree(1, &root);
+int32 generate_test_leaves() {
+    FILE* fd;
+    int32 c_left, generated_leaves;
+    int8 buf[256];
+    int8 *path, *value;
+    Node *n;
 
-    free(l2);
-    free(l1);
-    free(n2);
-    free(n);
- 
+    fd = fopen(ExampleFile, "r");
+    assert(fd);
+
+    zero(buf, 256);
+    generated_leaves = 0;
+    while(fgets((char *)buf, 255, fd)) {
+        c_left = (int32)strlen((char *)buf);
+        *(buf + c_left - 1) = 0;
+        path = generate_test_path(*buf);
+        n = find_node(path);
+        if(!n) {
+            zero(buf, 256);
+            continue;
+        }
+        value = test_duplicate(buf);
+        create_leaf(n, buf, value, (int16)strlen((char *)value));
+        ++generated_leaves;
+        zero(buf, 256);
+    }
+    fclose(fd);
+
+    return generated_leaves;
+}
+
+int main() {
+    Tree *test;
+    int32 leaves_count;
+
+    test = generate_test_tree();
+
+    printf("Populating tree...\n");
+    fflush(stdout);
+
+    leaves_count = generate_test_leaves();
+    printf("Done! Generated: %d leaves\n", leaves_count);
+
+    print_tree(1, test);    
+
     return 0;
 }
 #pragma GCC diagnostic pop
